@@ -6,6 +6,7 @@ Content type: `application/json` (except where noted)
 > **Companion flow docs** (M4 — programs, ranking, review, decisions, interviews):
 > [`programs.md`](programs.md) · [`ranking.md`](ranking.md) · [`review-queue.md`](review-queue.md) · [`decisions.md`](decisions.md) · [`interviews.md`](interviews.md)
 > M3 — document vault & OCR: [`documents.md`](documents.md)
+> M6.9/10 — notifications, preferences, STATUS shortcode, jobs: [`notifications.md`](notifications.md)
 > Auth flows: [`login-register.md`](login-register.md)
 
 **Auth summary**

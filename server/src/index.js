@@ -10,6 +10,8 @@ import programRoutes from './modules/programs/routes.js';
 import applicationRoutes from './modules/applications/routes.js';
 import interviewRoutes from './modules/interviews/routes.js';
 import documentRoutes from './modules/documents/routes.js';
+import notificationRoutes from './modules/notifications/routes.js';
+import { startJobs } from './jobs/scheduler.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
 dotenv.config();
@@ -36,6 +38,7 @@ app.use('/api/programs', programRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api', interviewRoutes);
 app.use('/api/documents', documentRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.get('/api/health', async (_req, res) => {
   try {
@@ -100,6 +103,12 @@ app.get('/api', (_req, res) => {
       'GET  /api/documents/queue',
       'POST /api/documents/:id/verify',
       'POST /api/documents/:id/reject',
+      'GET  /api/notifications',
+      'POST /api/notifications/:id/read',
+      'POST /api/notifications/read-all',
+      'GET  /api/notifications/preferences',
+      'PUT  /api/notifications/preferences',
+      'POST /api/notifications/sms/inbound',
     ],
   });
 });
@@ -109,4 +118,5 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`[server] http://localhost:${PORT} (${process.env.NODE_ENV || 'development'})`);
+  startJobs();
 });
