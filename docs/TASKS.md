@@ -129,8 +129,8 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 | M6.6 | Map loading/empty/error states | FR-IM-07 | Naved | todo |
 | M6.7 | Heatmap layer option (Google Maps or Leaflet) | FR-IM-08 | Naved | todo |
 | M6.8 | Analytics dashboard + report configs + PDF/CSV export | FR-M3-04 | Naved | todo |
-| M6.9 | Notification center (in-app/email/SMS) + preferences + STATUS shortcode | FR-M2-03 | Hemel | todo |
-| M6.10 | Deadline reminder cron | FR-M2-03 | Hemel | todo |
+| M6.9 | Notification center (in-app/email/SMS) + preferences + STATUS shortcode | FR-M2-03 | Hemel | in_progress |
+| M6.10 | Deadline reminder cron | FR-M2-03 | Hemel | done |
 | M6.11 | Dropout risk scoring + follow-up notes + program suggestions | FR-M3-05 | Hemel | todo |
 | M6.12 | Gemini assistant (live data) + suggest-before-ticket | FR-AI-01 | Hemel | todo |
 | M6.13 | Tickets: create, thread, My tickets | FR-AI-02/03 | Hemel | todo |
@@ -153,6 +153,20 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 | M7.7 | Final screenshots vs Figma parity check | All | todo |
 
 ---
+
+## Deferred DB smoke tests (blocked: Neon `DATABASE_URL` not yet in `server/.env` on Hemel's PC)
+
+Run once the URL is set — `cd server && npm run db:migrate`, then:
+
+- [ ] Migrations 008 + 009 apply cleanly on the shared Neon DB
+- [ ] Documents happy path, steps 1–8 of `documents/api-flows/documents.md` (upload → dev-OCR mismatch → confirm → admin queue → verify; re-upload with `replace: true`)
+- [ ] `DOCUMENT_EXISTS` 409 on duplicate kind without `replace`
+- [ ] Notifications: list + unread badge, `:id/read`, `read-all`, preferences round-trip (`notifications.md` happy path)
+- [ ] `notify()` respects `sms_enabled=false` / `email_enabled=false` (rows logged `skipped`)
+- [ ] STATUS shortcode with a seeded application + matching phone; foreign phone gets the no-enumeration reply
+- [ ] Jobs tick against real rows: auto-close past-deadline programme, 48h provider reminder, 24h re-upload nudge (dedup on second tick)
+
+**M6.9/M6.10 notes (2026-11-13)** — backend complete on `feature/notifications`: migration `009_notifications_center.sql`, `services/sms.js` (BulkSMSBD/Twilio, dev fallback), `lib/notify.js` upgraded (real recipient, preferences, timeouts, `dedupHours`), `modules/notifications/*`, `jobs/scheduler.js` (also closes M4.1's auto-close job). Flow doc: `documents/api-flows/notifications.md`. Remaining for M6.9: client UI (center + prefs screens), real gateway keys.
 
 ## Dependency notes
 

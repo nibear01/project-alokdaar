@@ -81,8 +81,10 @@ project-alokdaar/
 - Pipeline decision: `processing → action_required (student confirms mismatch) → pending → verified|rejected`; one active doc per (student, kind), replace supersedes.
 - Smoke-tested without DB: route mount, 401/403 role guards, Zod validation, upload-sign dev fallback; pure-logic unit checks for OCR parse/compare + Cloudinary signature.
 
+- **M6.9/M6.10 Notifications backend** on `feature/notifications`: `009_notifications_center.sql` (read_at, preferences, job_runs), `services/sms.js`, upgraded `lib/notify.js` (real recipient + preferences + dedupHours), notification center endpoints, public STATUS-shortcode webhook (`SMS_WEBHOOK_SECRET`), in-process jobs (auto-close programs — closes M4.1 leftover — deadline + re-upload reminders). Flow doc: `documents/api-flows/notifications.md`.
+
 **Waiting on**
-- Shared Neon `DATABASE_URL` in `server/.env` on Hemel's PC → run `npm run db:migrate` + full DB smoke test.
+- Shared Neon `DATABASE_URL` in `server/.env` on Hemel's PC → run `npm run db:migrate` + the checklist in TASKS.md "Deferred DB smoke tests".
 - `GOOGLE_VISION_API_KEY` + `CLOUDINARY_*` for real OCR/storage (dev fallbacks in place).
 
 ## Session state (2026-11-02)
