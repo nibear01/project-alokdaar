@@ -11,6 +11,7 @@ import applicationRoutes from './modules/applications/routes.js';
 import interviewRoutes from './modules/interviews/routes.js';
 import documentRoutes from './modules/documents/routes.js';
 import notificationRoutes from './modules/notifications/routes.js';
+import donationRoutes from './modules/donations/routes.js';
 import { startJobs } from './jobs/scheduler.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
@@ -30,6 +31,7 @@ app.use(
   }),
 );
 app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: false })); // SSLCommerz IPN posts form-encoded
 app.use(cookieParser());
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
@@ -39,6 +41,7 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api', interviewRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api', donationRoutes);
 
 app.get('/api/health', async (_req, res) => {
   try {
@@ -109,6 +112,16 @@ app.get('/api', (_req, res) => {
       'GET  /api/notifications/preferences',
       'PUT  /api/notifications/preferences',
       'POST /api/notifications/sms/inbound',
+      'GET  /api/campaigns',
+      'GET  /api/campaigns/:id',
+      'POST /api/donations/order',
+      'POST /api/donations/ipn',
+      'GET  /api/donations/:id/status',
+      'GET  /api/donations/mine',
+      'POST /api/donations/:id/recurring/pause|resume|cancel',
+      'GET  /api/donations/:id/receipt',
+      'GET  /api/donations/impact',
+      'GET  /api/providers/donations',
     ],
   });
 });

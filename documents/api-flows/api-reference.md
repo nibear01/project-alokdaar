@@ -7,6 +7,7 @@ Content type: `application/json` (except where noted)
 > [`programs.md`](programs.md) · [`ranking.md`](ranking.md) · [`review-queue.md`](review-queue.md) · [`decisions.md`](decisions.md) · [`interviews.md`](interviews.md)
 > M3 — document vault & OCR: [`documents.md`](documents.md)
 > M6.9/10 — notifications, preferences, STATUS shortcode, jobs: [`notifications.md`](notifications.md)
+> M5 — donations, IPN, receipts, provider CSV: [`donations.md`](donations.md)
 > Auth flows: [`login-register.md`](login-register.md)
 
 **Auth summary**
