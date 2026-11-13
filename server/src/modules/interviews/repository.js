@@ -136,17 +136,3 @@ export async function listForStudent(studentId) {
   );
   return rows;
 }
-
-// --- notifications (ARCHITECTURE 5.7) ---
-
-export async function insertNotification(client, {
-  userId, applicationId, interviewId, kind, channel, title, body, status,
-}) {
-  const { rows } = await client.query(
-    `INSERT INTO notifications (user_id, application_id, interview_id, kind, channel, title, body, status)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-     RETURNING id, channel, status`,
-    [userId, applicationId ?? null, interviewId ?? null, kind, channel, title ?? null, body ?? null, status],
-  );
-  return rows[0];
-}

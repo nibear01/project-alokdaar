@@ -1,4 +1,5 @@
 import * as repo from './repository.js';
+import { notify } from '../../lib/notify.js';
 
 function err(message, code, status = 400, details) {
   const e = new Error(message);
@@ -295,4 +296,186 @@ export async function bulkDecide(programId, actor, input) {
   } finally {
     client.release();
   }
+}
+
+// --- withdraw + auto-promote (FR-DA-05, FR-RS-08) ---
+
+/**
+ * Student withdraws own application.
+ * Deadline lock applies to pre-decision states only (RULES: edit-locked after
+ * deadline); waitlisted/approved may withdraw anytime so seat release +
+ * auto-promote stay available post-deadline.
+ * Approved withdrawal frees a seat → promotes the next waitlisted applicant.
+ */
+export async function withdraw(applicationId, actor, input) {
+  if (actor.role !== 'student') throw err('Students only', 'FORBIDDEN', 403);
+  const row = await repo.findForDecision(applicationId);
+  if (!row) throw err('Application not found', 'APPLICATION_NOT_FOUND', 404);
+  if (Number(row.student_id) !== actor.id) throw err('Not your application', 'FORBIDDEN', 403);
+
+  const PRE_DECISION = ['submitted', 'under_review', 'shortlisted'];
+  if (PRE_DECISION.includes(row.status) && Date.parse(row.deadline) < Date.now()) {
+    throw err('Edit/withdraw is locked after the deadline', 'DEADLINE_PASSED', 409, {
+      deadline: row.deadline,
+    });
+  }
+  if (['rejected', 'withdrawn'].includes(row.status)) {
+    throw err(`Cannot withdraw from status "${row.status}"`, 'INVALID_TRANSITION', 409);
+  }
+
+  const wasApproved = row.status === 'approved';
+  const { getClient } = await import('../../config/db.js');
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: updatedRows } = await client.query(
+      `UPDATE applications
+       SET status = 'withdrawn', updated_at = now()
+       WHERE id = $1
+       RETURNING id, program_id, student_id, status, rank, score`,
+      [row.id],
+    );
+    await repo.insertEvent(client, {
+      applicationId: row.id,
+      fromStatus: row.status,
+      toStatus: 'withdrawn',
+      actorId: actor.id,
+      actorRole: 'student',
+      note: input.reason ?? null,
+    });
+    await repo.removeFromWaitlist(client, row.id);
+    const cancelledInterviews = await repo.cancelOpenInterviews(client, row.id);
+
+    let promoted = null;
+    let seatsAvailable = row.seats_available;
+
+    if (wasApproved) {
+      seatsAvailable = await repo.freeSeat(client, row.program_id);
+
+      const next = await repo.findNextWaitlist(client, row.program_id);
+      if (next) {
+        // consume the freed seat for the promote — net seat change zero
+        const seats = await repo.decrementSeats(client, row.program_id);
+        if (seats !== null) {
+          seatsAvailable = seats;
+          const { rows: promoRows } = await client.query(
+            `UPDATE applications
+             SET status = 'approved', decided_at = now(), updated_at = now()
+             WHERE id = $1
+             RETURNING id, program_id, student_id, status, rank, score, decided_at`,
+            [next.application_id],
+          );
+          promoted = promoRows[0];
+          await repo.removeFromWaitlist(client, next.application_id);
+          await repo.insertEvent(client, {
+            applicationId: next.application_id,
+            fromStatus: 'waitlisted',
+            toStatus: 'approved',
+            actorId: null,
+            actorRole: 'system',
+            note: 'Auto-promoted: seat freed by withdrawal',
+          });
+          await notify(client, {
+            userId: next.student_id,
+            applicationId: next.application_id,
+            kind: 'waitlist_promoted',
+            title: `You've been promoted — ${row.program_title}`,
+            body: `A seat opened up for "${row.program_title}" and you've been approved (rank #${next.rank}).`,
+          });
+        }
+      }
+    }
+
+    await client.query('COMMIT');
+    const { rows: finalRow } = await client.query(
+      `SELECT id, program_id, student_id, status, rank, score FROM applications WHERE id = $1`,
+      [row.id],
+    );
+    return {
+      application: finalRow[0],
+      promoted,
+      seats_available: seatsAvailable,
+      cancelled_interviews: cancelledInterviews,
+    };
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+// --- waitlist view / reorder / manual promote (FR-RS-08) ---
+
+async function assertProgramOwned(programId, actor) {
+  const { query } = await import('../../config/db.js');
+  const { rows } = await query(`SELECT provider_id FROM programs WHERE id = $1`, [programId]);
+  if (!rows[0]) throw err('Program not found', 'PROGRAM_NOT_FOUND', 404);
+  if (actor.role === 'provider' && Number(rows[0].provider_id) !== actor.id) {
+    throw err('Not your program', 'FORBIDDEN', 403);
+  }
+}
+
+export async function listWaitlist(programId, actor) {
+  await assertProgramOwned(programId, actor);
+  const waitlist = await repo.listWaitlist(programId);
+  return { waitlist, total: waitlist.length };
+}
+
+export async function reorderWaitlist(programId, actor, applicationIds) {
+  await assertProgramOwned(programId, actor);
+  const current = await repo.listWaitlist(programId);
+  const currentIds = current.map((r) => Number(r.application_id));
+  const nextIds = applicationIds.map(Number);
+  const sameSet =
+    nextIds.length === currentIds.length &&
+    new Set(nextIds).size === nextIds.length &&
+    nextIds.every((id) => currentIds.includes(id));
+  if (!sameSet) {
+    throw err(
+      'Reorder must include exactly the current waitlist entries, each once',
+      'WAITLIST_MISMATCH',
+      409,
+      { expected: currentIds, received: nextIds },
+    );
+  }
+
+  const { getClient } = await import('../../config/db.js');
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+    // offset first so the unique (program_id, position) constraint never fires mid-swap
+    await client.query(`UPDATE waitlist SET position = position + 100000 WHERE program_id = $1`, [programId]);
+    for (let i = 0; i < nextIds.length; i++) {
+      await client.query(
+        `UPDATE waitlist SET position = $1 WHERE program_id = $2 AND application_id = $3`,
+        [i + 1, programId, nextIds[i]],
+      );
+    }
+    await client.query('COMMIT');
+    return { waitlist: await repo.listWaitlist(programId) };
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+/** Manual promote — only waitlisted rows; reuses approve rules (seats, duplicate-aid, events). */
+export async function promoteFromWaitlist(programId, applicationId, actor, input = {}) {
+  await assertProgramOwned(programId, actor);
+  const row = await repo.findForDecision(applicationId);
+  if (!row || Number(row.program_id) !== Number(programId)) {
+    throw err('Application not in this program', 'NOT_IN_PROGRAM', 404);
+  }
+  if (row.status !== 'waitlisted') {
+    throw err(
+      `Only waitlisted applications can be promoted (current: ${row.status})`,
+      'INVALID_TRANSITION',
+      409,
+    );
+  }
+  return decide(applicationId, actor, { decision: 'approve', ...input });
 }

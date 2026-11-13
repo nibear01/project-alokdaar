@@ -72,16 +72,21 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 
 | ID | Task | FR | Owner | Status |
 |---|---|---|---|---|
-| M4.1 | Program management CRUD + lifecycle (draft/open/paused/closed + auto-close job) | FR-M1-02 | Naved | todo |
-| M4.2 | Review queue API + UI (rank, breakdown bar, filters, bulk actions) | FR-RS-01 | Naved | todo |
-| M4.3 | Ranking weights editor (Σ=100 validation, top-5 preview, re-rank) | FR-RS-02 | Naved | todo |
-| M4.4 | Applicant detail + score explanation + AI summary hook | FR-RS-03 | Naved | todo |
-| M4.5 | Duplicate-aid detection + conflict modal | FR-RS-04 | Naved | todo |
-| M4.6 | Approve / Reject / Waitlist decision modals | FR-RS-05 | Naved | todo |
-| M4.7 | Interview scheduling + Google Calendar/Meet + SMS | FR-RS-06 | Naved | todo |
-| M4.8 | Interviews list (Join / Reschedule) | FR-RS-07 | Naved | todo |
-| M4.9 | Waitlist + auto-promotion on withdrawal | FR-RS-08 | Naved | todo |
-| M4.10 | Student interview view (countdown, Join Meet) | FR-RS-09 | Naved | todo |
+| M4.1 | Program management CRUD + lifecycle (draft/open/paused/closed + auto-close job) | FR-M1-02 | Naved | in_progress |
+| M4.2 | Review queue API + UI (rank, breakdown bar, filters, bulk actions) | FR-RS-01 | Naved | in_progress |
+| M4.3 | Ranking weights editor (Σ=100 validation, top-5 preview, re-rank) | FR-RS-02 | Naved | in_progress |
+| M4.4 | Applicant detail + score explanation + AI summary hook | FR-RS-03 | Naved | in_progress |
+| M4.5 | Duplicate-aid detection + conflict modal | FR-RS-04 | Naved | in_progress |
+| M4.6 | Approve / Reject / Waitlist decision modals | FR-RS-05 | Naved | in_progress |
+| M4.7 | Interview scheduling + Google Calendar/Meet + SMS | FR-RS-06 | Naved | in_progress |
+| M4.8 | Interviews list (Join / Reschedule) | FR-RS-07 | Naved | in_progress |
+| M4.9 | Waitlist + auto-promotion on withdrawal | FR-RS-08 | Naved | done |
+| M4.10 | Student interview view (countdown, Join Meet) | FR-RS-09 | Naved | in_progress |
+
+**M4 notes (2026-11-13)**
+- **Backend APIs complete & smoke-tested** for M4.1–M4.10 — see `documents/api-flows/` (`programs.md`, `ranking.md`, `review-queue.md`, `decisions.md`, `interviews.md`).
+- Remaining: auto-close job (M4.1); client UI screens for queue/weights/modals/interviews (M4.2–M4.10); real Google Calendar/Meet + SMS gateway (M4.7, needs credentials); AI summary hook (M4.4, needs Gemini key — pairs with M6.12).
+- M4.9 fully done (list/reorder/promote/withdraw auto-promote, notifications).
 
 ---
 

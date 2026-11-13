@@ -114,7 +114,8 @@ export async function findActiveScholarships(studentId, excludeApplicationId) {
 export async function findForDecision(applicationId) {
   const { rows } = await query(
     `SELECT a.id, a.program_id, a.student_id, a.status,
-            p.provider_id, p.seats_available, p.amount_per_student
+            p.provider_id, p.seats_available, p.amount_per_student,
+            p.deadline, p.title AS program_title
      FROM applications a
      JOIN programs p ON p.id = a.program_id
      WHERE a.id = $1`,
@@ -186,4 +187,57 @@ export async function insertWaitlist(client, { programId, applicationId, positio
 
 export async function removeFromWaitlist(client, applicationId) {
   await client.query(`DELETE FROM waitlist WHERE application_id = $1`, [applicationId]);
+}
+
+// --- waitlist management (FR-RS-08) ---
+
+export async function listWaitlist(programId) {
+  const { rows } = await query(
+    `SELECT w.position, w.application_id, w.created_at AS waitlisted_at,
+            a.status, a.rank, a.score, a.duplicate_aid,
+            u.id AS student_id, u.name AS student_name, u.email AS student_email
+     FROM waitlist w
+     JOIN applications a ON a.id = w.application_id
+     JOIN users u ON u.id = a.student_id
+     WHERE w.program_id = $1
+     ORDER BY w.position ASC`,
+    [programId],
+  );
+  return rows;
+}
+
+export async function findNextWaitlist(client, programId) {
+  const { rows } = await client.query(
+    `SELECT w.application_id, w.position, a.student_id, a.rank, a.score
+     FROM waitlist w
+     JOIN applications a ON a.id = w.application_id
+     WHERE w.program_id = $1
+     ORDER BY w.position ASC
+     LIMIT 1
+     FOR UPDATE`,
+    [programId],
+  );
+  return rows[0] || null;
+}
+
+/** Returns new seats_available after freeing one. */
+export async function freeSeat(client, programId) {
+  const { rows } = await client.query(
+    `UPDATE programs
+     SET seats_available = seats_available + 1, updated_at = now()
+     WHERE id = $1
+     RETURNING seats_available`,
+    [programId],
+  );
+  return rows[0]?.seats_available ?? null;
+}
+
+/** Cancel open interviews tied to a withdrawn application. */
+export async function cancelOpenInterviews(client, applicationId) {
+  const { rowCount } = await client.query(
+    `UPDATE interviews SET status = 'cancelled', updated_at = now()
+     WHERE application_id = $1 AND status IN ('scheduled', 'reschedule_requested')`,
+    [applicationId],
+  );
+  return rowCount;
 }

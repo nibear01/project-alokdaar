@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authJwt, requireRole } from '../../middleware/auth.js';
-import { queueQuerySchema, decideSchema, validate } from './schemas.js';
+import { queueQuerySchema, decideSchema, withdrawSchema, validate } from './schemas.js';
 import * as service from './service.js';
 
 const router = Router();
@@ -40,6 +40,18 @@ router.post(
   handle(async (req, res) => {
     const input = validate(decideSchema, req.body);
     const result = await service.decide(Number(req.params.id), req.user, input);
+    res.json(result);
+  }),
+);
+
+/** POST /api/applications/:id/withdraw — FR-DA-05 + auto-promote FR-RS-08 */
+router.post(
+  '/:id/withdraw',
+  authJwt,
+  requireRole('student'),
+  handle(async (req, res) => {
+    const input = validate(withdrawSchema, req.body ?? {});
+    const result = await service.withdraw(Number(req.params.id), req.user, input);
     res.json(result);
   }),
 );

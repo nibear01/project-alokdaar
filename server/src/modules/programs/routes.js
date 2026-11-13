@@ -10,7 +10,13 @@ import * as service from './service.js';
 import * as rankingService from '../ranking/service.js';
 import { weightsPutSchema, validate as validateRanking } from '../ranking/schemas.js';
 import * as applicationService from '../applications/service.js';
-import { queueQuerySchema, bulkDecideSchema, validate as validateQueue } from '../applications/schemas.js';
+import {
+  queueQuerySchema,
+  bulkDecideSchema,
+  promoteSchema,
+  reorderSchema,
+  validate as validateQueue,
+} from '../applications/schemas.js';
 
 const router = Router();
 
@@ -81,6 +87,44 @@ for (const action of ['publish', 'pause', 'resume', 'close']) {
     }),
   );
 }
+
+/** GET /api/programs/:id/waitlist — ordered waitlist (FR-RS-08) */
+router.get(
+  '/:id/waitlist',
+  authJwt,
+  requireRole('provider', 'admin'),
+  handle(async (req, res) => {
+    res.json(await applicationService.listWaitlist(Number(req.params.id), req.user));
+  }),
+);
+
+/** PUT /api/programs/:id/waitlist/reorder — full new order (FR-RS-08) */
+router.put(
+  '/:id/waitlist/reorder',
+  authJwt,
+  requireRole('provider', 'admin'),
+  handle(async (req, res) => {
+    const { application_ids } = validateQueue(reorderSchema, req.body);
+    res.json(await applicationService.reorderWaitlist(Number(req.params.id), req.user, application_ids));
+  }),
+);
+
+/** POST /api/programs/:id/waitlist/:applicationId/promote — manual promote (FR-RS-08) */
+router.post(
+  '/:id/waitlist/:applicationId/promote',
+  authJwt,
+  requireRole('provider', 'admin'),
+  handle(async (req, res) => {
+    const input = validateQueue(promoteSchema, req.body ?? {});
+    const result = await applicationService.promoteFromWaitlist(
+      Number(req.params.id),
+      Number(req.params.applicationId),
+      req.user,
+      input,
+    );
+    res.json(result);
+  }),
+);
 
 /** POST /api/programs/:id/bulk-decide — bulk shortlist/reject (FR-RS-01) */
 router.post(

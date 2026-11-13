@@ -3,6 +3,10 @@
 Base URL: `http://localhost:4000`  
 Content type: `application/json` (except where noted)
 
+> **Companion flow docs** (M4 — programs, ranking, review, decisions, interviews):
+> [`programs.md`](programs.md) · [`ranking.md`](ranking.md) · [`review-queue.md`](review-queue.md) · [`decisions.md`](decisions.md) · [`interviews.md`](interviews.md)
+> Auth flows: [`login-register.md`](login-register.md)
+
 **Auth summary**
 
 | Token | Where | Lifetime |

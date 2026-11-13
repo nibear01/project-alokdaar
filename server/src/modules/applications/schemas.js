@@ -49,6 +49,24 @@ export const bulkDecideSchema = z.object({
   }
 });
 
+/** FR-DA-05 withdraw (before deadline for pre-decision states) */
+export const withdrawSchema = z.object({
+  reason: z.string().trim().max(1000).optional(),
+});
+
+/** FR-RS-08 waitlist reorder — exact current set, new order */
+export const reorderSchema = z.object({
+  application_ids: z.array(z.number().int().positive()).min(1).max(500),
+});
+
+/** FR-RS-08 manual promote — approve options only, decision is implied */
+export const promoteSchema = z.object({
+  remarks: z.string().trim().min(3).max(1000).optional(),
+  message: z.string().trim().max(1000).optional(),
+  force_reason: z.string().trim().min(3).max(1000).optional(),
+  committed_amount: z.number().nonnegative().optional(),
+});
+
 export function validate(schema, data) {
   const result = schema.safeParse(data);
   if (!result.success) {

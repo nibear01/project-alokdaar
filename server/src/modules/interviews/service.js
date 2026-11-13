@@ -1,4 +1,5 @@
 import * as repo from './repository.js';
+import { notify } from '../../lib/notify.js';
 
 function err(message, code, status = 400, details) {
   const e = new Error(message);
@@ -21,46 +22,6 @@ function generateMeetLink() {
   const part = (n) =>
     Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
   return `https://meet.google.com/${part(3)}-${part(4)}-${part(3)}`;
-}
-
-async function notifyStudent(client, { userId, applicationId, interviewId, kind, title, body }) {
-  // in-app always
-  await repo.insertNotification(client, {
-    userId, applicationId, interviewId, kind, channel: 'in_app', title, body, status: 'sent',
-  });
-  // email — SendGrid only when configured; otherwise log as skipped
-  const hasSendGrid = Boolean(process.env.SENDGRID_API_KEY);
-  await repo.insertNotification(client, {
-    userId, applicationId, interviewId, kind, channel: 'email', title, body,
-    status: hasSendGrid ? 'pending' : 'skipped',
-  });
-  // sms — gateway (Twilio/BulkSMSBD) not wired yet: record intent
-  await repo.insertNotification(client, {
-    userId, applicationId, interviewId, kind, channel: 'sms', title, body, status: 'skipped',
-  });
-  if (hasSendGrid) {
-    try {
-      const sg = (await import('@sendgrid/mail')).default;
-      sg.setApiKey(process.env.SENDGRID_API_KEY);
-      await sg.send({
-        to: process.env.NOTIFY_EMAIL_FALLBACK || 'dev@alokdaar.local',
-        from: process.env.FROM_EMAIL || 'noreply@alokdaar.local',
-        subject: title,
-        text: body,
-      });
-      await client.query(
-        `UPDATE notifications SET status = 'sent'
-         WHERE interview_id = $1 AND channel = 'email' AND kind = $2`,
-        [interviewId, kind],
-      );
-    } catch {
-      await client.query(
-        `UPDATE notifications SET status = 'failed'
-         WHERE interview_id = $1 AND channel = 'email' AND kind = $2`,
-        [interviewId, kind],
-      );
-    }
-  }
 }
 
 // --- weekly slot templates (FR-RS-06) ---
@@ -189,7 +150,7 @@ export async function schedule(applicationId, actor, input) {
 
     const start = new Date(input.slot_start);
     const when = start.toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
-    await notifyStudent(client, {
+    await notify(client, {
       userId: context.student_id,
       applicationId,
       interviewId: interview.id,
@@ -270,7 +231,7 @@ export async function reschedule(interviewId, actor, input) {
     });
 
     const when = new Date(input.slot_start).toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
-    await notifyStudent(client, {
+    await notify(client, {
       userId: iv.student_id,
       applicationId: iv.application_id,
       interviewId: iv.id,
