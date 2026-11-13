@@ -57,7 +57,7 @@ export async function getApplicationsWithInputs(programId) {
      FROM applications a
      LEFT JOIN latest_academic la ON la.student_id = a.student_id
      LEFT JOIN latest_household lh ON lh.student_id = a.student_id
-     WHERE a.program_id = $1 AND a.status <> 'withdrawn'
+     WHERE a.program_id = $1 AND a.status NOT IN ('withdrawn', 'draft')
      ORDER BY a.id`,
     [programId],
   );

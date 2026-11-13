@@ -15,6 +15,8 @@ import donationRoutes from './modules/donations/routes.js';
 import dropoutRoutes from './modules/dropout/routes.js';
 import impactRoutes from './modules/impact/routes.js';
 import profileRoutes from './modules/profiles/routes.js';
+import discoveryRoutes from './modules/discovery/routes.js';
+import recordRoutes from './modules/records/routes.js';
 import { startJobs } from './jobs/scheduler.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
@@ -48,6 +50,8 @@ app.use('/api', donationRoutes);
 app.use('/api/dropout', dropoutRoutes);
 app.use('/api', impactRoutes);
 app.use('/api/me', profileRoutes);
+app.use('/api/me', recordRoutes);
+app.use('/api/discovery', discoveryRoutes);
 
 app.get('/api/health', async (_req, res) => {
   try {
@@ -140,6 +144,20 @@ app.get('/api', (_req, res) => {
       'GET  /api/impact/summary',
       'GET  /api/impact/districts/:district',
       'GET  /api/analytics/overview',
+      'GET  /api/me/records',
+      'POST /api/me/academic',
+      'POST /api/me/household',
+      'GET  /api/discovery/programs',
+      'GET  /api/discovery/programs/:id',
+      'GET  /api/discovery/bookmarks',
+      'PUT  /api/discovery/bookmarks/:programId',
+      'DELETE /api/discovery/bookmarks/:programId',
+      'POST /api/discovery/applications',
+      'GET  /api/discovery/applications',
+      'GET  /api/discovery/applications/:id',
+      'PATCH /api/discovery/applications/:id',
+      'POST /api/discovery/applications/:id/submit',
+      'DELETE /api/discovery/applications/:id',
     ],
   });
 });

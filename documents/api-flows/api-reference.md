@@ -9,6 +9,7 @@ Content type: `application/json` (except where noted)
 > M6.9/10 — notifications, preferences, STATUS shortcode, jobs: [`notifications.md`](notifications.md)
 > M5 — donations, IPN, receipts, provider CSV: [`donations.md`](donations.md)
 > M6.1/8/11 — impact, analytics, dropout, student profile: [`impact-dropout.md`](impact-dropout.md)
+> M2 — discovery, eligibility, wizard, records: [`discovery.md`](discovery.md)
 > Auth flows: [`login-register.md`](login-register.md)
 
 **Auth summary**
