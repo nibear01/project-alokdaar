@@ -41,17 +41,20 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 
 | ID | Task | FR | Owner | Status |
 |---|---|---|---|---|
-| M2.1 | Program search/filter API + UI (provider, district, amount, level, deadline) | FR-DA-01 | Rafi | todo |
-| M2.2 | Eligibility engine + per-card badge (exact fail reason) | FR-DA-02 | Rafi | todo |
-| M2.3 | Bookmarks API + Bookmarked screen | FR-DA-03 | Rafi | todo |
+| M2.1 | Program search/filter API + UI (provider, district, amount, level, deadline) | FR-DA-01 | Rafi (API: Hemel) | in_progress |
+| M2.2 | Eligibility engine + per-card badge (exact fail reason) | FR-DA-02 | Rafi (engine: Hemel) | in_progress |
+| M2.3 | Bookmarks API + Bookmarked screen | FR-DA-03 | Rafi (API: Hemel) | in_progress |
 | M2.4 | Programme detail page | FR-DA-05 | Rafi | todo |
-| M2.5 | 4-step wizard (details → docs → statement → review) + confirm + success | FR-DA-04 | Rafi | todo |
-| M2.6 | Edit/withdraw + deadline lock + withdraw dialog | FR-DA-05 | Rafi | todo |
-| M2.7 | My Applications list + detail timeline + interview block | FR-DA-06 | Rafi | todo |
+| M2.5 | 4-step wizard (details → docs → statement → review) + confirm + success | FR-DA-04 | Rafi (API: Hemel) | in_progress |
+| M2.6 | Edit/withdraw + deadline lock + withdraw dialog | FR-DA-05 | Rafi (API: Hemel) | in_progress |
+| M2.7 | My Applications list + detail timeline + interview block | FR-DA-06 | Rafi (API: Hemel) | in_progress |
 | M2.8 | Loading / empty / error states for discovery | FR-DA-07 | Rafi | todo |
-| M2.9 | Academic & household records CRUD + history | FR-M1-03 | Rafi | todo |
-| M2.10 | Renewal: semester upload → CGPA hold + provider notify | FR-M1-03 | Rafi | todo |
+| M2.9 | Academic & household records CRUD + history | FR-M1-03 | Rafi (API: Hemel) | in_progress |
+| M2.10 | Renewal: semester upload → CGPA hold + provider notify | FR-M1-03 | Rafi (API: Hemel) | in_progress |
 | M2.11 | Mobile responsive pass for all student screens | — | Rafi | todo |
+
+
+**M2 notes (2026-11-13)** — backend APIs on `feature/discovery` (stacked on `feature/impact-dropout`): `012_discovery.sql` (`draft` status, nullable submitted_at, one live application per programme+student, `bookmarks`), `modules/discovery` (search with per-card eligibility + exact fail reasons, detail checklist, bookmarks, wizard draft→autosave→submit with server-side re-checks incl. vault docs, My Applications + timeline), `modules/records` (/api/me/records, /api/me/academic upsert with renewal provider notify, /api/me/household). Provider queue + ranking now exclude drafts; withdraw rejects drafts. Flow doc `documents/api-flows/discovery.md`. Remaining: all UI (Rafi), eligibility caching (ARCH §5.1 — computed live for now), M2.4/M2.8/M2.11 are UI-only.
 
 ---
 
@@ -169,6 +172,7 @@ Run once the URL is set — `cd server && npm run db:migrate`, then:
 - [ ] `notify()` respects `sms_enabled=false` / `email_enabled=false` (rows logged `skipped`)
 - [ ] STATUS shortcode with a seeded application + matching phone; foreign phone gets the no-enumeration reply
 - [ ] Jobs tick against real rows: auto-close past-deadline programme, 48h provider reminder, 24h re-upload nudge (dedup on second tick)
+- [ ] Discovery happy path (documents/api-flows/discovery.md): records + profile → search eligibility badge → bookmark → draft → autosave → submit blocked on missing docs → vault upload → submit → provider queue shows it (and never shows drafts)
 - [ ] Impact/dropout happy path (documents/api-flows/impact-dropout.md): profile PUT → recompute → high case → notes/recommend/status → impact summary + CSV → public headline
 - [ ] Donations happy path (documents/api-flows/donations.md): order (guest + signed-in) → dev-confirm → fund_raised increment, tip excluded → receipt → idempotent re-confirm → recurring pause/resume/cancel → provider CSV
 

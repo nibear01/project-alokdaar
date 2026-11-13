@@ -85,6 +85,7 @@ project-alokdaar/
 
 - **M5 Donations backend** on `feature/donations`: SSLCommerz session + validated idempotent IPN (fund increments only there), campaigns, receipts, recurring pause/resume/cancel, donor impact, provider CSV. Dev-confirm fallback without sandbox keys. `010_donations.sql`.
 - **M6.1/M6.8/M6.11 backend** on `feature/impact-dropout`: `student_profiles` + /api/me/profile, per-district impact aggregates + CSV, analytics overview, dropout scoring/cases/notes/recommendations. `011_impact_dropout.sql`. Branch order: documents -> notifications -> donations -> impact-dropout.
+- **M2 Discovery backend** on `feature/discovery`: eligibility engine (pure), search/detail/bookmarks, wizard with `draft` application status, records CRUD + renewal notify. Branch order now: documents -> notifications -> donations -> impact-dropout -> discovery.
 
 **Waiting on**
 - Shared Neon `DATABASE_URL` in `server/.env` on Hemel's PC → run `npm run db:migrate` + the checklist in TASKS.md "Deferred DB smoke tests".

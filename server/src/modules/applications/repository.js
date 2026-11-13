@@ -5,7 +5,8 @@ import { query } from '../../config/db.js';
  * + score breakdown for the colour bar + duplicate-aid badge.
  */
 export async function queueForProgram(programId, filters) {
-  const where = ['a.program_id = $1'];
+  // drafts are wizard-in-progress (M2) — never shown to providers
+  const where = ['a.program_id = $1', `a.status <> 'draft'`];
   const params = [programId];
 
   if (filters.status) {

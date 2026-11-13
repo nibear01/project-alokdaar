@@ -322,6 +322,10 @@ export async function withdraw(applicationId, actor, input) {
   if (['rejected', 'withdrawn'].includes(row.status)) {
     throw err(`Cannot withdraw from status "${row.status}"`, 'INVALID_TRANSITION', 409);
   }
+  if (row.status === 'draft') {
+    // M2 wizard drafts are discarded, not withdrawn (DELETE /api/discovery/applications/:id)
+    throw err('Drafts are deleted, not withdrawn', 'INVALID_TRANSITION', 409);
+  }
 
   const wasApproved = row.status === 'approved';
   const { getClient } = await import('../../config/db.js');
