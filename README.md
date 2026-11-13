@@ -59,3 +59,13 @@ Health check: `GET http://localhost:4000/api/health` → `{ ok, db, service }`.
 - Never commit `.env` — only `*.env.example`.
 - Use Neon **pooled** URL in `DATABASE_URL`.
 - FR IDs and conventions: see [`docs/RULES.md`](docs/RULES.md).
+
+## Demo accounts (dev only)
+
+`npm run db:seed` (in `server/`) creates verified demo logins — refuses to run in production:
+
+| Role | Email | Password |
+|---|---|---|
+| admin | admin@alokdaar.local | `Alokdaar123!dev` (override: `SEED_PASSWORD`) |
+| provider | provider@alokdaar.local | same |
+| student | student@alokdaar.local | same |

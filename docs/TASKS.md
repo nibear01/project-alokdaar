@@ -149,7 +149,7 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 
 | ID | Task | Owner | Status |
 |---|---|---|---|
-| M7.1 | Seed script: demo programs, applications, donations, districts | All | todo |
+| M7.1 | Seed script: demo programs, applications, donations, districts | All | in_progress |
 | M7.2 | E2E happy paths: apply → review → approve; donate → IPN → receipt | All | todo |
 | M7.3 | Ledger integrity audit demo + OCR mismatch demo | Rafi, Hemel | todo |
 | M7.4 | Performance pass (indexes on filters, map aggregates) | Naved | todo |
@@ -161,20 +161,18 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 
 **M6.1/M6.8/M6.11 notes (2026-11-13)** — backend APIs on `feature/impact-dropout` (stacked on `feature/donations`): `011_impact_dropout.sql` (`student_profiles`, `dropout_cases`, `dropout_notes`), `modules/profiles` (GET/PUT /api/me/profile — also unblocks M2.9), `modules/impact` (public headline, per-district summary + CSV, district/upazila drill-down, analytics overview), `modules/dropout` (pure scoring, recompute, cases, notes, status, programme recommendations + notify). Flow doc `documents/api-flows/impact-dropout.md`. Remaining: map/analytics UI (Naved), report configs + PDF (M6.8), funds_disbursed once the M5.9 ledger exists, Bangla map strings (client).
 
-## Deferred DB smoke tests (blocked: Neon `DATABASE_URL` not yet in `server/.env` on Hemel's PC)
+## Deferred DB smoke tests — RUN 2026-11-13 ✅ (Neon URL now in server/.env; migrations 008–012 applied; 15-stage E2E all green)
 
-Run once the URL is set — `cd server && npm run db:migrate`, then:
-
-- [ ] Migrations 008 + 009 apply cleanly on the shared Neon DB
-- [ ] Documents happy path, steps 1–8 of `documents/api-flows/documents.md` (upload → dev-OCR mismatch → confirm → admin queue → verify; re-upload with `replace: true`)
-- [ ] `DOCUMENT_EXISTS` 409 on duplicate kind without `replace`
-- [ ] Notifications: list + unread badge, `:id/read`, `read-all`, preferences round-trip (`notifications.md` happy path)
-- [ ] `notify()` respects `sms_enabled=false` / `email_enabled=false` (rows logged `skipped`)
-- [ ] STATUS shortcode with a seeded application + matching phone; foreign phone gets the no-enumeration reply
-- [ ] Jobs tick against real rows: auto-close past-deadline programme, 48h provider reminder, 24h re-upload nudge (dedup on second tick)
-- [ ] Discovery happy path (documents/api-flows/discovery.md): records + profile → search eligibility badge → bookmark → draft → autosave → submit blocked on missing docs → vault upload → submit → provider queue shows it (and never shows drafts)
-- [ ] Impact/dropout happy path (documents/api-flows/impact-dropout.md): profile PUT → recompute → high case → notes/recommend/status → impact summary + CSV → public headline
-- [ ] Donations happy path (documents/api-flows/donations.md): order (guest + signed-in) → dev-confirm → fund_raised increment, tip excluded → receipt → idempotent re-confirm → recurring pause/resume/cancel → provider CSV
+- [x] Migrations 008–012 apply cleanly on the shared Neon DB
+- [x] Documents happy path, steps 1–8 of `documents/api-flows/documents.md` (upload → dev-OCR mismatch → confirm → admin queue → verify; re-upload with `replace: true`)
+- [x] `DOCUMENT_EXISTS` 409 on duplicate kind without `replace`
+- [x] Notifications: list + unread badge, `:id/read`, `read-all`, preferences round-trip (`notifications.md` happy path)
+- [x] `notify()` respects `sms_enabled=false` / `email_enabled=false` (rows logged `skipped`)
+- [x] STATUS shortcode with a seeded application + matching phone; foreign phone gets the no-enumeration reply
+- [x] Jobs tick against real rows (auto-closed 1 stale past-deadline programme): auto-close past-deadline programme, 48h provider reminder, 24h re-upload nudge (dedup on second tick)
+- [x] Discovery happy path (documents/api-flows/discovery.md): records + profile → search eligibility badge → bookmark → draft → autosave → submit blocked on missing docs → vault upload → submit → provider queue shows it (and never shows drafts)
+- [x] Impact/dropout happy path (documents/api-flows/impact-dropout.md): profile PUT → recompute → high case → notes/recommend/status → impact summary + CSV → public headline
+- [x] Donations happy path (double-confirm correctly rejected; fund incremented exactly once, tip excluded) (documents/api-flows/donations.md): order (guest + signed-in) → dev-confirm → fund_raised increment, tip excluded → receipt → idempotent re-confirm → recurring pause/resume/cancel → provider CSV
 
 **M6.9/M6.10 notes (2026-11-13)** — backend complete on `feature/notifications`: migration `009_notifications_center.sql`, `services/sms.js` (BulkSMSBD/Twilio, dev fallback), `lib/notify.js` upgraded (real recipient, preferences, timeouts, `dedupHours`), `modules/notifications/*`, `jobs/scheduler.js` (also closes M4.1's auto-close job). Flow doc: `documents/api-flows/notifications.md`. Remaining for M6.9: client UI (center + prefs screens), real gateway keys.
 

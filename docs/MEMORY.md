@@ -88,7 +88,7 @@ project-alokdaar/
 - **M2 Discovery backend** on `feature/discovery`: eligibility engine (pure), search/detail/bookmarks, wizard with `draft` application status, records CRUD + renewal notify. Branch order now: documents -> notifications -> donations -> impact-dropout -> discovery.
 
 **Waiting on**
-- Shared Neon `DATABASE_URL` in `server/.env` on Hemel's PC → run `npm run db:migrate` + the checklist in TASKS.md "Deferred DB smoke tests".
+- ~~Neon `DATABASE_URL`~~ — set 2026-11-13; migrations 008–012 applied, full 15-stage E2E green (see TASKS checklist). `npm run db:seed` creates demo admin/provider/student (`*@alokdaar.local`, password via SEED_PASSWORD, default in README).
 - `GOOGLE_VISION_API_KEY` + `CLOUDINARY_*` for real OCR/storage (dev fallbacks in place).
 
 ## Session state (2026-11-02)
