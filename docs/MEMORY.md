@@ -73,6 +73,18 @@ project-alokdaar/
 - Naved second docx is an **unfilled template** (ignore or delete before submit).
 - Hemel: boards exist; check whether a filled assignment docx is required.
 
+## Session state (2026-11-13 · Hemel)
+
+**Done**
+- Cloned repo to this PC; reviewed Naved's merged work (auth, programs, review/decisions, ranking, interviews, waitlist).
+- **M3 Document Vault backend** on `feature/documents`: migration `008_documents.sql`, `services/cloudinary.js` (presigned, no SDK) + `services/ocr.js` (Vision REST + dev fallback), `modules/documents/*`, wired in `index.js`. Flow doc: `documents/api-flows/documents.md`.
+- Pipeline decision: `processing → action_required (student confirms mismatch) → pending → verified|rejected`; one active doc per (student, kind), replace supersedes.
+- Smoke-tested without DB: route mount, 401/403 role guards, Zod validation, upload-sign dev fallback; pure-logic unit checks for OCR parse/compare + Cloudinary signature.
+
+**Waiting on**
+- Shared Neon `DATABASE_URL` in `server/.env` on Hemel's PC → run `npm run db:migrate` + full DB smoke test.
+- `GOOGLE_VISION_API_KEY` + `CLOUDINARY_*` for real OCR/storage (dev fallbacks in place).
+
 ## Session state (2026-11-02)
 
 **Done**

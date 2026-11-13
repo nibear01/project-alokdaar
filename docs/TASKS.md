@@ -59,12 +59,18 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 
 | ID | Task | FR | Owner | Status |
 |---|---|---|---|---|
-| M3.1 | Cloudinary upload API (replace/delete) | FR-DV-01 | Hemel | todo |
-| M3.2 | Google Vision extract + mismatch compare job | FR-DV-02 | Hemel | todo |
-| M3.3 | Status pipeline pending/verified/rejected + re-upload | FR-DV-03 | Hemel | todo |
+| M3.1 | Cloudinary upload API (replace/delete) | FR-DV-01 | Hemel | done |
+| M3.2 | Google Vision extract + mismatch compare job | FR-DV-02 | Hemel | in_progress |
+| M3.3 | Status pipeline pending/verified/rejected + re-upload | FR-DV-03 | Hemel | done |
 | M3.4 | Vault UI: list, upload, processing, check-what-we-read, error states | FR-DV-04 | Hemel | todo |
-| M3.5 | Admin verification queue + document detail actions | FR-DV-05 | Hemel | todo |
+| M3.5 | Admin verification queue + document detail actions | FR-DV-05 | Hemel | in_progress |
 | M3.6 | Mobile vault screens | FR-DV-06 | Hemel | todo |
+
+**M3 notes (2026-11-13)**
+- **Backend APIs complete** for M3.1–M3.3 and M3.5 (queue + verify/reject) on `feature/documents` — see `documents/api-flows/documents.md`. Migration `008_documents.sql` (documents + document_events, one active doc per student×kind).
+- Pipeline refinement vs ARCHITECTURE §5.4: OCR mismatch → `action_required` (student confirms, Figma H1-4) → `pending` (admin queue) → `verified | rejected`.
+- Dev fallbacks: no Cloudinary keys → direct `file_url` register (dev only); no `GOOGLE_VISION_API_KEY` → deterministic OCR from the student's profile (file name containing `mismatch` forces one mismatch for demos).
+- Remaining: real Vision call verification once `GOOGLE_VISION_API_KEY` exists (M3.2); admin UI + vault UI (M3.4–M3.6); DB smoke test pending shared Neon `DATABASE_URL` on this machine.
 
 ---
 
