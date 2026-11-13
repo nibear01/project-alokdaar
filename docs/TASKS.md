@@ -100,14 +100,16 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 
 | ID | Task | FR | Owner | Status |
 |---|---|---|---|---|
-| M5.1 | Campaigns list + detail APIs/UI (progress, general fund) | FR-DN-01/02 | Rafi | todo |
-| M5.2 | Checkout + SSLCommerz session (one-time/monthly) | FR-DN-03 | Rafi | todo |
-| M5.3 | IPN webhook: verify, idempotent confirm, fund increment | FR-DN-09 | Rafi | blocked* |
+| M5.1 | Campaigns list + detail APIs/UI (progress, general fund) | FR-DN-01/02 | Rafi (API: Hemel) | in_progress |
+| M5.2 | Checkout + SSLCommerz session (one-time/monthly) | FR-DN-03 | Rafi (API: Hemel) | in_progress |
+| M5.3 | IPN webhook: verify, idempotent confirm, fund increment | FR-DN-09 | Rafi (API: Hemel) | review |
 | M5.4 | Redirect/verifying/success/pending/failed screens | FR-DN-04 | Rafi | todo |
-| M5.5 | Receipt generation (print + PDF) | FR-DN-05 | Rafi | todo |
-| M5.6 | My donations + recurring pause/change/cancel | FR-DN-06 | Rafi | todo |
-| M5.7 | My impact anonymized CGPA view | FR-DN-07 | Rafi | todo |
-| M5.8 | Provider donations received + CSV | FR-DN-08 | Rafi | todo |
+| M5.5 | Receipt generation (print + PDF) | FR-DN-05 | Rafi (JSON: Hemel) | in_progress |
+| M5.6 | My donations + recurring pause/change/cancel | FR-DN-06 | Rafi (API: Hemel) | in_progress |
+| M5.7 | My impact anonymized CGPA view | FR-DN-07 | Rafi (API: Hemel) | in_progress |
+| M5.8 | Provider donations received + CSV | FR-DN-08 | Rafi (API: Hemel) | in_progress |
+
+**M5.1–M5.8 notes (2026-11-13)** — backend APIs on `feature/donations` (branched off `feature/notifications`; merge in order): `010_donations.sql` (donations, receipts, `programs.fund_raised`), `services/sslcommerz.js` (session + validator with timeouts), `modules/donations/*` (campaigns, guest/signed-in checkout, idempotent IPN with server-side validation, dev-confirm fallback, status poll, mine + recurring pause/resume/cancel, receipt JSON, donor impact, provider received + CSV). Flow doc `documents/api-flows/donations.md`. Remaining: all UI screens (Rafi), SSLCommerz sandbox keys → real IPN test (M5.3 stays "review" until then), receipt PDF (M5.5/M5.11), recurring re-charge job (needs gateway agreement).
 | M5.9 | Installment schedule + disbursement record (method, ref) | FR-M3-01 | Rafi | todo |
 | M5.10 | Hash-chained ledger + integrity verify | FR-M3-01 | Rafi | todo |
 | M5.11 | PDF award letter + QR → public verify page | FR-M3-01 | Rafi | todo |
@@ -165,6 +167,7 @@ Run once the URL is set — `cd server && npm run db:migrate`, then:
 - [ ] `notify()` respects `sms_enabled=false` / `email_enabled=false` (rows logged `skipped`)
 - [ ] STATUS shortcode with a seeded application + matching phone; foreign phone gets the no-enumeration reply
 - [ ] Jobs tick against real rows: auto-close past-deadline programme, 48h provider reminder, 24h re-upload nudge (dedup on second tick)
+- [ ] Donations happy path (documents/api-flows/donations.md): order (guest + signed-in) → dev-confirm → fund_raised increment, tip excluded → receipt → idempotent re-confirm → recurring pause/resume/cancel → provider CSV
 
 **M6.9/M6.10 notes (2026-11-13)** — backend complete on `feature/notifications`: migration `009_notifications_center.sql`, `services/sms.js` (BulkSMSBD/Twilio, dev fallback), `lib/notify.js` upgraded (real recipient, preferences, timeouts, `dedupHours`), `modules/notifications/*`, `jobs/scheduler.js` (also closes M4.1's auto-close job). Flow doc: `documents/api-flows/notifications.md`. Remaining for M6.9: client UI (center + prefs screens), real gateway keys.
 
