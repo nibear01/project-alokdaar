@@ -73,6 +73,10 @@ project-alokdaar/
 - Naved second docx is an **unfilled template** (ignore or delete before submit).
 - Hemel: boards exist; check whether a filled assignment docx is required.
 
+## Session state (2026-11-14 · Hemel)
+
+**All six backend feature branches merged into `main`** (merge commits c1c67c7..d673399, in stack order: documents → notifications → donations → impact-dropout → discovery → disbursements). `main` now has migrations 001–013, 11 modules, the seed script, and all flow docs; everything below referring to feature branches is history. Backend remaining: tickets + AI assistant (M6.12–15), third-party keys, client UI.
+
 ## Session state (2026-11-13 · Hemel)
 
 **Done**
