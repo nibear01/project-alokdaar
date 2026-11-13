@@ -123,17 +123,17 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 
 | ID | Task | FR | Owner | Status |
 |---|---|---|---|---|
-| M6.1 | Aggregate API: district/upazila funds, students, unfunded | FR-IM-01 | Naved | todo |
+| M6.1 | Aggregate API: district/upazila funds, students, unfunded | FR-IM-01 | Naved (API: Hemel) | in_progress |
 | M6.2 | Tile map UI + filters + top districts + create-campaign CTA | FR-IM-01 | Naved | todo |
 | M6.3 | Bangla map + locale switch | FR-IM-02 | Naved | todo |
 | M6.4 | District panel + upazila drill-down + CSV | FR-IM-03/04 | Naved | todo |
 | M6.5 | Mobile map + public landing section | FR-IM-05/06 | Naved | todo |
 | M6.6 | Map loading/empty/error states | FR-IM-07 | Naved | todo |
 | M6.7 | Heatmap layer option (Google Maps or Leaflet) | FR-IM-08 | Naved | todo |
-| M6.8 | Analytics dashboard + report configs + PDF/CSV export | FR-M3-04 | Naved | todo |
+| M6.8 | Analytics dashboard + report configs + PDF/CSV export | FR-M3-04 | Naved (overview API + CSV: Hemel) | in_progress |
 | M6.9 | Notification center (in-app/email/SMS) + preferences + STATUS shortcode | FR-M2-03 | Hemel | in_progress |
 | M6.10 | Deadline reminder cron | FR-M2-03 | Hemel | done |
-| M6.11 | Dropout risk scoring + follow-up notes + program suggestions | FR-M3-05 | Hemel | todo |
+| M6.11 | Dropout risk scoring + follow-up notes + program suggestions | FR-M3-05 | Hemel | in_progress |
 | M6.12 | Gemini assistant (live data) + suggest-before-ticket | FR-AI-01 | Hemel | todo |
 | M6.13 | Tickets: create, thread, My tickets | FR-AI-02/03 | Hemel | todo |
 | M6.14 | Admin help desk queue + resolve/close | FR-AI-03 | Hemel | todo |
@@ -156,6 +156,8 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 
 ---
 
+**M6.1/M6.8/M6.11 notes (2026-11-13)** — backend APIs on `feature/impact-dropout` (stacked on `feature/donations`): `011_impact_dropout.sql` (`student_profiles`, `dropout_cases`, `dropout_notes`), `modules/profiles` (GET/PUT /api/me/profile — also unblocks M2.9), `modules/impact` (public headline, per-district summary + CSV, district/upazila drill-down, analytics overview), `modules/dropout` (pure scoring, recompute, cases, notes, status, programme recommendations + notify). Flow doc `documents/api-flows/impact-dropout.md`. Remaining: map/analytics UI (Naved), report configs + PDF (M6.8), funds_disbursed once the M5.9 ledger exists, Bangla map strings (client).
+
 ## Deferred DB smoke tests (blocked: Neon `DATABASE_URL` not yet in `server/.env` on Hemel's PC)
 
 Run once the URL is set — `cd server && npm run db:migrate`, then:
@@ -167,6 +169,7 @@ Run once the URL is set — `cd server && npm run db:migrate`, then:
 - [ ] `notify()` respects `sms_enabled=false` / `email_enabled=false` (rows logged `skipped`)
 - [ ] STATUS shortcode with a seeded application + matching phone; foreign phone gets the no-enumeration reply
 - [ ] Jobs tick against real rows: auto-close past-deadline programme, 48h provider reminder, 24h re-upload nudge (dedup on second tick)
+- [ ] Impact/dropout happy path (documents/api-flows/impact-dropout.md): profile PUT → recompute → high case → notes/recommend/status → impact summary + CSV → public headline
 - [ ] Donations happy path (documents/api-flows/donations.md): order (guest + signed-in) → dev-confirm → fund_raised increment, tip excluded → receipt → idempotent re-confirm → recurring pause/resume/cancel → provider CSV
 
 **M6.9/M6.10 notes (2026-11-13)** — backend complete on `feature/notifications`: migration `009_notifications_center.sql`, `services/sms.js` (BulkSMSBD/Twilio, dev fallback), `lib/notify.js` upgraded (real recipient, preferences, timeouts, `dedupHours`), `modules/notifications/*`, `jobs/scheduler.js` (also closes M4.1's auto-close job). Flow doc: `documents/api-flows/notifications.md`. Remaining for M6.9: client UI (center + prefs screens), real gateway keys.

@@ -83,6 +83,9 @@ project-alokdaar/
 
 - **M6.9/M6.10 Notifications backend** on `feature/notifications`: `009_notifications_center.sql` (read_at, preferences, job_runs), `services/sms.js`, upgraded `lib/notify.js` (real recipient + preferences + dedupHours), notification center endpoints, public STATUS-shortcode webhook (`SMS_WEBHOOK_SECRET`), in-process jobs (auto-close programs — closes M4.1 leftover — deadline + re-upload reminders). Flow doc: `documents/api-flows/notifications.md`.
 
+- **M5 Donations backend** on `feature/donations`: SSLCommerz session + validated idempotent IPN (fund increments only there), campaigns, receipts, recurring pause/resume/cancel, donor impact, provider CSV. Dev-confirm fallback without sandbox keys. `010_donations.sql`.
+- **M6.1/M6.8/M6.11 backend** on `feature/impact-dropout`: `student_profiles` + /api/me/profile, per-district impact aggregates + CSV, analytics overview, dropout scoring/cases/notes/recommendations. `011_impact_dropout.sql`. Branch order: documents -> notifications -> donations -> impact-dropout.
+
 **Waiting on**
 - Shared Neon `DATABASE_URL` in `server/.env` on Hemel's PC → run `npm run db:migrate` + the checklist in TASKS.md "Deferred DB smoke tests".
 - `GOOGLE_VISION_API_KEY` + `CLOUDINARY_*` for real OCR/storage (dev fallbacks in place).
