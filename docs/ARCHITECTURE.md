@@ -146,11 +146,14 @@ Recurring: schedule; pause / change / cancel from My donations.
 ### 5.4 Document OCR
 
 ```text
-upload → Cloudinary store → status=pending
-  → Google Vision extract fields
-  → compare to student-entered data
-  → verified | rejected(reason) | mismatch flag → admin queue
-Re-upload allowed after reject.
+upload (presigned Cloudinary) → status=processing
+  → Google Vision extract fields (dev fallback when no key)
+  → compare to student profile (users + latest_academic + latest_household)
+      clean    → pending (admin queue)
+      mismatch → action_required (student confirms per field, H1-4) → pending
+  → admin: verified | rejected(reason) → notify student
+Re-upload/replace supersedes the old row (history kept); one active doc per (student, kind).
+Implemented: 008_documents.sql + modules/documents — see documents/api-flows/documents.md.
 ```
 
 ### 5.5 Disbursement ledger (tamper-evident)

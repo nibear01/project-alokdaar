@@ -9,6 +9,7 @@ import authRoutes from './modules/auth/routes.js';
 import programRoutes from './modules/programs/routes.js';
 import applicationRoutes from './modules/applications/routes.js';
 import interviewRoutes from './modules/interviews/routes.js';
+import documentRoutes from './modules/documents/routes.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
 dotenv.config();
@@ -34,6 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/programs', programRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api', interviewRoutes);
+app.use('/api/documents', documentRoutes);
 
 app.get('/api/health', async (_req, res) => {
   try {
@@ -89,6 +91,15 @@ app.get('/api', (_req, res) => {
       'POST /api/interviews/:id/reschedule',
       'POST /api/interviews/:id/status',
       'POST /api/interviews/:id/request-slot',
+      'GET  /api/documents',
+      'POST /api/documents/upload-sign',
+      'POST /api/documents',
+      'GET  /api/documents/:id',
+      'POST /api/documents/:id/confirm',
+      'DELETE /api/documents/:id',
+      'GET  /api/documents/queue',
+      'POST /api/documents/:id/verify',
+      'POST /api/documents/:id/reject',
     ],
   });
 });
