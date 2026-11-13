@@ -24,6 +24,7 @@
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.0",
     "pg": "^8.13.1",
+    "qrcode": "^1.5.4",
     "zod": "^3.24.1"
   },
   "devDependencies": {

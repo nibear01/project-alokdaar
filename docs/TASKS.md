@@ -113,12 +113,15 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 | M5.8 | Provider donations received + CSV | FR-DN-08 | Rafi (API: Hemel) | in_progress |
 
 **M5.1–M5.8 notes (2026-11-13)** — backend APIs on `feature/donations` (branched off `feature/notifications`; merge in order): `010_donations.sql` (donations, receipts, `programs.fund_raised`), `services/sslcommerz.js` (session + validator with timeouts), `modules/donations/*` (campaigns, guest/signed-in checkout, idempotent IPN with server-side validation, dev-confirm fallback, status poll, mine + recurring pause/resume/cancel, receipt JSON, donor impact, provider received + CSV). Flow doc `documents/api-flows/donations.md`. Remaining: all UI screens (Rafi), SSLCommerz sandbox keys → real IPN test (M5.3 stays "review" until then), receipt PDF (M5.5/M5.11), recurring re-charge job (needs gateway agreement).
-| M5.9 | Installment schedule + disbursement record (method, ref) | FR-M3-01 | Rafi | todo |
-| M5.10 | Hash-chained ledger + integrity verify | FR-M3-01 | Rafi | todo |
-| M5.11 | PDF award letter + QR → public verify page | FR-M3-01 | Rafi | todo |
-| M5.12 | Student confirm receipt + payment history | FR-M3-01 | Rafi | todo |
+| M5.9 | Installment schedule + disbursement record (method, ref) | FR-M3-01 | Rafi (API: Hemel) | review |
+| M5.10 | Hash-chained ledger + integrity verify | FR-M3-01 | Rafi (API: Hemel) | review |
+| M5.11 | PDF award letter + QR → public verify page | FR-M3-01 | Rafi (API: Hemel) | in_progress |
+| M5.12 | Student confirm receipt + payment history | FR-M3-01 | Rafi (API: Hemel) | review |
 
 \* blocked on sandbox credentials
+
+
+**M5.9–M5.12 notes (2026-11-14)** — backend on `feature/disbursements` (stacked on `feature/discovery`): `013_disbursements.sql` (installments, disbursements with one live payment per installment, append-only `ledger_entries`, `award_letters`, `programs.fund_disbursed`), `lib/ledger.js` (sha256 chain, unit-tested vs tamper/splice/re-hash), `modules/disbursements` (schedule, disburse under an advisory lock, void-with-reason, ledger views + verify, public PII-free ledger, award letter HTML+QR via new `qrcode` dep, public /verify/award/:code with initials only, student confirm-receipt + /api/me/payments). 8-stage E2E green on Neon incl. a live SQL-tamper detection (M7.3 ledger demo done; OCR mismatch demo covered by the 15-stage run). Remaining: UI (Rafi), server-side PDF if required (browser print of the HTML letter works for the demo).
 
 ---
 
@@ -151,7 +154,7 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 |---|---|---|---|
 | M7.1 | Seed script: demo programs, applications, donations, districts | All | in_progress |
 | M7.2 | E2E happy paths: apply → review → approve; donate → IPN → receipt | All | todo |
-| M7.3 | Ledger integrity audit demo + OCR mismatch demo | Rafi, Hemel | todo |
+| M7.3 | Ledger integrity audit demo + OCR mismatch demo | Rafi, Hemel | review |
 | M7.4 | Performance pass (indexes on filters, map aggregates) | Naved | todo |
 | M7.5 | Security pass (roles, webhook sig, PII in logs) | All | todo |
 | M7.6 | Deploy Vercel + Render; staging env vars | Rafi | todo |
@@ -169,6 +172,7 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 - [x] Notifications: list + unread badge, `:id/read`, `read-all`, preferences round-trip (`notifications.md` happy path)
 - [x] `notify()` respects `sms_enabled=false` / `email_enabled=false` (rows logged `skipped`)
 - [x] STATUS shortcode with a seeded application + matching phone; foreign phone gets the no-enumeration reply
+- [x] Disbursements happy path (documents/api-flows/disbursements.md): approve (duplicate-aid force) → schedule → disburse → ledger verify → SQL tamper detected + restored → void → award letter QR → public verify → confirm receipt
 - [x] Jobs tick against real rows (auto-closed 1 stale past-deadline programme): auto-close past-deadline programme, 48h provider reminder, 24h re-upload nudge (dedup on second tick)
 - [x] Discovery happy path (documents/api-flows/discovery.md): records + profile → search eligibility badge → bookmark → draft → autosave → submit blocked on missing docs → vault upload → submit → provider queue shows it (and never shows drafts)
 - [x] Impact/dropout happy path (documents/api-flows/impact-dropout.md): profile PUT → recompute → high case → notes/recommend/status → impact summary + CSV → public headline

@@ -86,6 +86,7 @@ project-alokdaar/
 - **M5 Donations backend** on `feature/donations`: SSLCommerz session + validated idempotent IPN (fund increments only there), campaigns, receipts, recurring pause/resume/cancel, donor impact, provider CSV. Dev-confirm fallback without sandbox keys. `010_donations.sql`.
 - **M6.1/M6.8/M6.11 backend** on `feature/impact-dropout`: `student_profiles` + /api/me/profile, per-district impact aggregates + CSV, analytics overview, dropout scoring/cases/notes/recommendations. `011_impact_dropout.sql`. Branch order: documents -> notifications -> donations -> impact-dropout.
 - **M2 Discovery backend** on `feature/discovery`: eligibility engine (pure), search/detail/bookmarks, wizard with `draft` application status, records CRUD + renewal notify. Branch order now: documents -> notifications -> donations -> impact-dropout -> discovery.
+- **M5.9–M5.12 Disbursements backend** on `feature/disbursements`: hash-chained ledger (advisory-locked appends, verify endpoint, live tamper demo passed), installments, void-with-reason, award letter HTML+QR (`qrcode` dep), public verify + public ledger (no PII), student confirm-receipt. Branch order: documents → notifications → donations → impact-dropout → discovery → disbursements.
 
 **Waiting on**
 - ~~Neon `DATABASE_URL`~~ — set 2026-11-13; migrations 008–012 applied, full 15-stage E2E green (see TASKS checklist). `npm run db:seed` creates demo admin/provider/student (`*@alokdaar.local`, password via SEED_PASSWORD, default in README).

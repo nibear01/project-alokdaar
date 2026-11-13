@@ -2,7 +2,7 @@ import { query } from '../../config/db.js';
 
 const COLS = `
   id, provider_id, title, description, criteria,
-  total_fund, amount_per_student, seats, seats_available,
+  total_fund, fund_raised, fund_disbursed, amount_per_student, seats, seats_available,
   required_docs, deadline, status, location_district, education_level,
   created_at, updated_at
 `;
