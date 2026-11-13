@@ -17,6 +17,7 @@ import impactRoutes from './modules/impact/routes.js';
 import profileRoutes from './modules/profiles/routes.js';
 import discoveryRoutes from './modules/discovery/routes.js';
 import recordRoutes from './modules/records/routes.js';
+import disbursementRoutes from './modules/disbursements/routes.js';
 import { startJobs } from './jobs/scheduler.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
@@ -52,6 +53,7 @@ app.use('/api', impactRoutes);
 app.use('/api/me', profileRoutes);
 app.use('/api/me', recordRoutes);
 app.use('/api/discovery', discoveryRoutes);
+app.use('/api', disbursementRoutes);
 
 app.get('/api/health', async (_req, res) => {
   try {
@@ -158,6 +160,18 @@ app.get('/api', (_req, res) => {
       'PATCH /api/discovery/applications/:id',
       'POST /api/discovery/applications/:id/submit',
       'DELETE /api/discovery/applications/:id',
+      'POST /api/applications/:id/installments',
+      'GET  /api/applications/:id/installments',
+      'POST /api/installments/:id/disburse',
+      'POST /api/disbursements/:id/void',
+      'POST /api/disbursements/:id/confirm-receipt',
+      'GET  /api/me/payments',
+      'GET  /api/ledger',
+      'GET  /api/ledger/verify',
+      'GET  /api/ledger/public',
+      'POST /api/applications/:id/award-letter',
+      'GET  /api/applications/:id/award-letter',
+      'GET  /api/verify/award/:code',
     ],
   });
 });
