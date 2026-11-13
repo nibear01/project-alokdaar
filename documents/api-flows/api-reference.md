@@ -11,6 +11,7 @@ Content type: `application/json` (except where noted)
 > M6.1/8/11 — impact, analytics, dropout, student profile: [`impact-dropout.md`](impact-dropout.md)
 > M2 — discovery, eligibility, wizard, records: [`discovery.md`](discovery.md)
 > M5.9–12 — installments, ledger, award letters: [`disbursements.md`](disbursements.md)
+> M6.12–15 — assistant, tickets, reviewer: [`tickets-ai.md`](tickets-ai.md)
 > Auth flows: [`login-register.md`](login-register.md)
 
 **Auth summary**

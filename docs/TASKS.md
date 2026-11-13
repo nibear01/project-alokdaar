@@ -140,10 +140,10 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 | M6.9 | Notification center (in-app/email/SMS) + preferences + STATUS shortcode | FR-M2-03 | Hemel | in_progress |
 | M6.10 | Deadline reminder cron | FR-M2-03 | Hemel | done |
 | M6.11 | Dropout risk scoring + follow-up notes + program suggestions | FR-M3-05 | Hemel | in_progress |
-| M6.12 | Gemini assistant (live data) + suggest-before-ticket | FR-AI-01 | Hemel | todo |
-| M6.13 | Tickets: create, thread, My tickets | FR-AI-02/03 | Hemel | todo |
-| M6.14 | Admin help desk queue + resolve/close | FR-AI-03 | Hemel | todo |
-| M6.15 | AI reviewer: 3-line summary + originality flag | FR-AI-04 | Hemel | todo |
+| M6.12 | Gemini assistant (live data) + suggest-before-ticket | FR-AI-01 | Hemel | in_progress |
+| M6.13 | Tickets: create, thread, My tickets | FR-AI-02/03 | Hemel | review |
+| M6.14 | Admin help desk queue + resolve/close | FR-AI-03 | Hemel | review |
+| M6.15 | AI reviewer: 3-line summary + originality flag | FR-AI-04 | Hemel | in_progress |
 | M6.16 | Mobile assistant/tickets screens | FR-AI-05 | Hemel | todo |
 
 ---
@@ -172,6 +172,7 @@ Owners: **Rafi** = 22201075 · **Naved** = 22201025 · **Hemel** = 22299367
 - [x] Notifications: list + unread badge, `:id/read`, `read-all`, preferences round-trip (`notifications.md` happy path)
 - [x] `notify()` respects `sms_enabled=false` / `email_enabled=false` (rows logged `skipped`)
 - [x] STATUS shortcode with a seeded application + matching phone; foreign phone gets the no-enumeration reply
+- [x] Tickets/AI happy path (documents/api-flows/tickets-ai.md): chat → escalate with transcript → inbox/assign → internal note hidden → resolve → rate → reopen → reviewer summary cached + role-guarded
 - [x] Disbursements happy path (documents/api-flows/disbursements.md): approve (duplicate-aid force) → schedule → disburse → ledger verify → SQL tamper detected + restored → void → award letter QR → public verify → confirm receipt
 - [x] Jobs tick against real rows (auto-closed 1 stale past-deadline programme): auto-close past-deadline programme, 48h provider reminder, 24h re-upload nudge (dedup on second tick)
 - [x] Discovery happy path (documents/api-flows/discovery.md): records + profile → search eligibility badge → bookmark → draft → autosave → submit blocked on missing docs → vault upload → submit → provider queue shows it (and never shows drafts)

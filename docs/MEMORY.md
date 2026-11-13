@@ -75,7 +75,7 @@ project-alokdaar/
 
 ## Session state (2026-11-14 · Hemel)
 
-**All six backend feature branches merged into `main`** (merge commits c1c67c7..d673399, in stack order: documents → notifications → donations → impact-dropout → discovery → disbursements). `main` now has migrations 001–013, 11 modules, the seed script, and all flow docs; everything below referring to feature branches is history. Backend remaining: tickets + AI assistant (M6.12–15), third-party keys, client UI.
+**All six backend feature branches merged into `main`** (merge commits c1c67c7..d673399, in stack order: documents → notifications → donations → impact-dropout → discovery → disbursements). `main` now has migrations 001–013, 11 modules, the seed script, and all flow docs; everything below referring to feature branches is history. Backend remaining: third-party keys and client UI only — tickets + AI assistant landed 2026-11-14 (modules/tickets, modules/assistant, services/gemini.js with dev fallback, 014_tickets_ai.sql; flow doc tickets-ai.md). M6.12/15 stay in_progress until a real GEMINI_API_KEY is exercised.
 
 ## Session state (2026-11-13 · Hemel)
 

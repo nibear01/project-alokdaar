@@ -18,6 +18,7 @@ import profileRoutes from './modules/profiles/routes.js';
 import discoveryRoutes from './modules/discovery/routes.js';
 import recordRoutes from './modules/records/routes.js';
 import disbursementRoutes from './modules/disbursements/routes.js';
+import ticketRoutes from './modules/tickets/routes.js';
 import { startJobs } from './jobs/scheduler.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
@@ -54,6 +55,7 @@ app.use('/api/me', profileRoutes);
 app.use('/api/me', recordRoutes);
 app.use('/api/discovery', discoveryRoutes);
 app.use('/api', disbursementRoutes);
+app.use('/api', ticketRoutes);
 
 app.get('/api/health', async (_req, res) => {
   try {
@@ -172,6 +174,16 @@ app.get('/api', (_req, res) => {
       'POST /api/applications/:id/award-letter',
       'GET  /api/applications/:id/award-letter',
       'GET  /api/verify/award/:code',
+      'POST /api/assistant/chat',
+      'GET  /api/applications/:id/ai-summary',
+      'POST /api/tickets',
+      'GET  /api/tickets/mine',
+      'GET  /api/tickets/:id',
+      'POST /api/tickets/:id/messages',
+      'POST /api/tickets/:id/rate',
+      'GET  /api/tickets',
+      'POST /api/tickets/:id/status',
+      'POST /api/tickets/:id/assign',
     ],
   });
 });
