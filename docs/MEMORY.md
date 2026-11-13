@@ -19,7 +19,10 @@ Scholarship discovery, provider selection, donations, disbursement ledger, OCR d
 
 ```text
 project-alokdaar/
-  documents/          # source of truth: assignment docx + Figma board PNGs
+  package.json          # npm workspaces: server + client; npm run dev = both
+  .gitignore            # ignores .env, node_modules, keys, uploads
+  README.md             # setup: Neon DATABASE_URL, migrate, dev
+  documents/            # source of truth: assignment docx + Figma board PNGs
     Assignment 1 _group 3.docx          # functional requirements (read this first)
     CSE471_Assignment_02_Figma_Rafi_22201075.docx
     CSE471_Assignment_02_Figma_Naved.docx
@@ -27,6 +30,15 @@ project-alokdaar/
     Alokdaar — Assignment 02 (CSE471 Figma)/  # 7 PNG boards
   docs/
     PRD.md ARCHITECTURE.md RULES.md DESIGN.md TASKS.md MEMORY.md
+    jira/               # FR import CSV/JSON (12 stories) + README
+  server/               # Express + pg; Neon-ready (SSL if neon.tech)
+    .env.example        # DATABASE_URL (Neon pooled), JWT, all 3rd-party keys
+    src/index.js        # helmet/cors/morgan + GET /api/health
+    src/config/db.js    # pool loads server/.env explicitly
+    src/db/migrate.js   # runs migrations/*.sql once (schema_migrations)
+    src/db/migrations/001_init.sql  # users, programs, program_weights
+  client/               # React + Vite + Tailwind (cream/forest/amber tokens)
+    .env.example        # VITE_API_URL
 ```
 
 ## Canonical decisions
@@ -61,6 +73,25 @@ project-alokdaar/
 - Naved second docx is an **unfilled template** (ignore or delete before submit).
 - Hemel: boards exist; check whether a filled assignment docx is required.
 
+## Session state (2026-11-02)
+
+**Done**
+- Read all documents (4 docx + 7 Figma PNGs); wrote six `docs/*.md`.
+- Monorepo scaffolded: `npm install` at root; `npm run dev` → server :4000 + client :5173.
+- `GET /api/health` verified (db down until real Neon URL set).
+- Neon chosen for Postgres (user decision — realtime-friendly managed DB).
+- Jira FR import ready in `docs/jira/`: 12 Stories, labels `rafi`/`naved`/`hemel`, epic name *Alokdaar Functional Requirements*.
+
+**Blocked / waiting on user**
+- Jira: need **existing project key** + three members’ **Jira usernames/emails** to rewrite CSV `Assignee` and JSON `"project": { "key": ... }`. User said project + team already exist — do not create a new Jira project.
+- Neon: paste pooled `DATABASE_URL` into `server/.env`, then `npm run db:migrate`.
+- SSLCommerz sandbox keys (IPN work).
+- Rafi Figma/prototype links still placeholders in his assignment docx.
+
+**How to import Jira once keys known**
+- CSV: Jira → Create → Import from CSV → pick existing project → map columns (see `docs/jira/README.md`).
+- JSON: `curl -X POST .../rest/api/3/issue/bulk` with API token after replacing `ALOK`.
+
 ## Gotchas
 
 - Two Naved docx files — use the filled `CSE471_Assignment_02_Figma_Naved.docx`, not `CSE471_Assignment 02 Figma_Naved.docx`.
@@ -77,3 +108,5 @@ project-alokdaar/
 - Do/don’t: `docs/RULES.md`
 - Screens & tokens: `docs/DESIGN.md`
 - Board: `docs/TASKS.md`
+- Jira import: `docs/jira/README.md`
+- Setup: `README.md` (root)
